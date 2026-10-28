@@ -1,5 +1,7 @@
 # Elanco UK Tick Sightings Backend
 
+Public repository: [furqanfsl/elanco-uk-tick-sightings-backend](https://github.com/furqanfsl/elanco-uk-tick-sightings-backend)
+
 ## Overview
 
 A small, read-only Python backend that imports the Elanco placement-task tick dataset, cleans it, stores it in SQLite, and returns searchable records and summaries as JSON. Swagger UI provides an interactive way to try the endpoints; there is no separate frontend.
@@ -62,7 +64,8 @@ The extra database/configuration/verifier tests isolate useful regressions. No d
 Prerequisites: Python 3.12 or later, Internet access for installation/import, and Git if cloning the repository. Python downloads: [python.org](https://www.python.org/downloads/). The verified runtimes were Python 3.12.13 and 3.15.2 on Windows. Use an ordinary PowerShell terminal in the project folder.
 
 ```powershell
-# After cloning, open the folder containing requirements.txt.
+git clone https://github.com/furqanfsl/elanco-uk-tick-sightings-backend.git
+cd elanco-uk-tick-sightings-backend
 py -3 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
@@ -170,7 +173,7 @@ With more time: source-supported pagination, conflict/skip-reason reports, a rev
 
 ## Author
 
-**[YOUR FULL NAME — replace before submission]**
+**Hafiz Furqan FAISEL**
 
 ## Assignment information
 

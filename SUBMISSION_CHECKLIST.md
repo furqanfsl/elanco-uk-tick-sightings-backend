@@ -1,6 +1,6 @@
 # Submission checklist
 
-**Deadline: Sunday 1 November 2026, 09:00 UK time.** Plan to finish before the deadline, especially given Friday/Saturday availability. The placement interview is Thursday 29 October. A working backend is not the same as a completed submission: publication approval, full name, video and sending the email remain human actions.
+**Deadline: Sunday 1 November 2026, 09:00 UK time.** Plan to finish before the deadline, especially given Friday/Saturday availability. The placement interview is Thursday 29 October. A working backend is not the same as a completed submission: the video and sending the email remain human actions. Public publication was approved on 28 October 2026. The name below matches the candidate's GitHub profile; confirm the preferred submission spelling before sending.
 
 ## Requirement review
 
@@ -31,10 +31,11 @@ The following evidence was observed on 28 October 2026. Automated verification i
 
 ### Before publishing
 
-- [ ] Replace `[YOUR FULL NAME]` in README, video script and email with the candidate's confirmed name.
+- [x] Add the name from the candidate's GitHub profile to the README, video script and email draft: Hafiz Furqan FAISEL.
+- [ ] Confirm that Hafiz Furqan FAISEL is the preferred name and spelling for the final submission.
 - [x] Review the final files and rerun tests after changes (117 passed on both tested Python runtimes).
 - [x] Confirm the final README launch record contains no outstanding verification items.
-- [ ] Approve making `elanco-uk-tick-sightings-backend` public. **Approval is still pending; do not assume publication is authorised.**
+- [x] Approve making `elanco-uk-tick-sightings-backend` public (explicit approval received 28 October 2026).
 - [ ] Confirm the public repository exists and contains the final intended commit.
 - [ ] Open its GitHub URL in a signed-out/private window and verify README/source access.
 - [ ] Confirm no private files were uploaded: no `.venv`, `.env`, database, downloaded raw dataset, caches, personal notes or credentials. `.gitignore` alone is not proof; inspect the actual committed/uploaded file list.
@@ -55,13 +56,13 @@ The following evidence was observed on 28 October 2026. Automated verification i
 
 **To:** BECKY.MEARS@network.elancoah.com
 
-**Subject:** Software Engineering Placement 2026 - Backend Task - [YOUR FULL NAME]
+**Subject:** Software Engineering Placement 2026 - Backend Task - Hafiz Furqan FAISEL
 
 Dear Becky,
 
 Please find my Backend technical task submission for the Elanco Software Engineering Placement 2026.
 
-- Candidate: [YOUR FULL NAME]
+- Candidate: Hafiz Furqan FAISEL
 - Public GitHub repository: [VERIFIED PUBLIC REPOSITORY LINK]
 - Walkthrough video: [VERIFIED VIDEO LINK OR ATTACHED FILENAME]
 
@@ -71,6 +72,6 @@ Thank you for considering my application.
 
 Kind regards,
 
-[YOUR FULL NAME]
+Hafiz Furqan FAISEL
 
 **This is a draft only. No email or video submission has been sent automatically.**

@@ -1,6 +1,6 @@
 # Walkthrough video plan
 
-**Status: script only. No video has been recorded or submitted.** Target about 7 minutes; keep the final recording under 10 minutes. Replace `[YOUR FULL NAME]` before speaking. Use this as a guide, not a claim that you wrote or understand something you have not reviewed.
+**Status: script only. No video has been recorded or submitted.** Target about 7 minutes; keep the final recording under 10 minutes. The candidate name matches the GitHub profile; confirm the preferred spoken name before recording. Use this as a guide, not a claim that you wrote or understand something you have not reviewed.
 
 ## Prepare before recording
 
@@ -28,7 +28,7 @@
 
 **Show:** README overview.
 
-"Hi, I'm [YOUR FULL NAME]. This is my backend submission for the Elanco placement task. It imports tick sighting records from the supplied API and stores a cleaned version locally. You can search by location and date, then get city counts or weekly and monthly trends. Elanco labels this an educational dataset, so these results are not live tick surveillance or a prediction of disease risk. I focused on a small, understandable backend rather than adding a separate frontend."
+"Hi, I'm Hafiz Furqan FAISEL. This is my backend submission for the Elanco placement task. It imports tick sighting records from the supplied API and stores a cleaned version locally. You can search by location and date, then get city counts or weekly and monthly trends. Elanco labels this an educational dataset, so these results are not live tick surveillance or a prediction of disease risk. I focused on a small, understandable backend rather than adding a separate frontend."
 
 ### 0:30-1:25 - Technologies
 
