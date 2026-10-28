@@ -48,15 +48,15 @@ The following evidence was observed on 28 October 2026. Automated verification i
 
 - [x] Add the name from the candidate's GitHub profile to the README, video script and email draft: Hafiz Furqan FAISEL.
 - [ ] Confirm that Hafiz Furqan FAISEL is the preferred name and spelling for the final submission.
-- [x] Review the files and rerun tests after changes (119 passed in the current project environment; see README for final clean-install/runtime rechecks).
+- [x] Review the files and rerun tests after changes: 119 passed in the current environment and a fresh anonymous public-clone installation; 0 failed and 0 skipped in each.
 - [x] Confirm the final README launch record contains no outstanding verification items.
 - [x] Approve making `elanco-uk-tick-sightings-backend` public (explicit approval received 28 October 2026).
 - [x] GitHub repository created and verified public with the user's approval.
 - [x] GitHub URL verified: https://github.com/furqanfsl/elanco-uk-tick-sightings-backend
-- [ ] After this audit's changes are pushed, verify the final remote `main` revision matches the local commit.
+- [x] After this audit's changes were pushed, verify the public remote `main` revision matches the local commit; recheck again after any subsequent change.
 - [x] Verify signed-out access: anonymous HTTP/source requests, a fresh browser context on desktop/mobile, and an anonymous Git clone all succeeded.
 - [x] Previously published file list reviewed: no `.venv`, `.env`, database, downloaded raw dataset, caches, personal notes or credentials; `data/` contains only `.gitkeep`.
-- [ ] Recheck the final uploaded file list after adding the shared task configuration; personal `.vscode/settings.json` and `memory.md` must remain ignored.
+- [x] Recheck the uploaded file list after adding the shared task configuration: 28 intended files match the local tracked list; only `.vscode/tasks.json` is shared. Personal `.vscode/settings.json`, `memory.md`, local data, environments and caches remain excluded.
 
 ### Video and final submission
 
