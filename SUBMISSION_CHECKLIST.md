@@ -36,9 +36,9 @@ The following evidence was observed on 28 October 2026. Automated verification i
 - [x] Review the final files and rerun tests after changes (117 passed on both tested Python runtimes).
 - [x] Confirm the final README launch record contains no outstanding verification items.
 - [x] Approve making `elanco-uk-tick-sightings-backend` public (explicit approval received 28 October 2026).
-- [ ] Confirm the public repository exists and contains the final intended commit.
-- [ ] Open its GitHub URL in a signed-out/private window and verify README/source access.
-- [ ] Confirm no private files were uploaded: no `.venv`, `.env`, database, downloaded raw dataset, caches, personal notes or credentials. `.gitignore` alone is not proof; inspect the actual committed/uploaded file list.
+- [x] Confirm the public repository exists and its `main` branch matches the local published commit.
+- [x] Verify signed-out access: anonymous HTTP/source requests, a fresh browser context on desktop/mobile, and an anonymous Git clone all succeeded.
+- [x] Inspect the actual uploaded file list: exactly 27 intended files, with no `.venv`, `.env`, database, downloaded raw dataset, caches, personal notes or credentials. The public tree matches `git ls-files`; `data/` contains only `.gitkeep`.
 
 ### Video and final submission
 
@@ -63,7 +63,7 @@ Dear Becky,
 Please find my Backend technical task submission for the Elanco Software Engineering Placement 2026.
 
 - Candidate: Hafiz Furqan FAISEL
-- Public GitHub repository: [VERIFIED PUBLIC REPOSITORY LINK]
+- Public GitHub repository: https://github.com/furqanfsl/elanco-uk-tick-sightings-backend
 - Walkthrough video: [VERIFIED VIDEO LINK OR ATTACHED FILENAME]
 
 The README includes instructions for running the application and tests, together with the main technical choices and limitations.
