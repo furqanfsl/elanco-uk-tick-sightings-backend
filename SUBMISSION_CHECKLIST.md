@@ -4,41 +4,59 @@
 
 ## Requirement review
 
-The following evidence was observed on 28 October 2026. Automated verification independently rerun during this documentation review: **117 tests passed**, with one documented upstream Starlette test-client deprecation warning. See the README's dated launch record for the latest installation, browser and running-server checks; subsequent changes require a recheck.
+The following evidence was observed on 28 October 2026. Automated verification independently rerun during this documentation review: **119 tests passed, 0 failed, 0 skipped**, with one documented upstream Starlette test-client deprecation warning. See the README's dated launch record for the latest installation, browser and running-server checks; subsequent changes require a recheck.
 
 | Requirement | Implementation | Test evidence | Status |
 |---|---|---|---|
-| Data handling: consume, clean, missing data and duplicates | `app/client.py:fetch_sightings`, `app/processing.py:normalize_record`, `app/database.py:save_sightings`, `scripts/import_sightings.py:import_sightings` | `test_processing.py`; `test_import.py:test_repeat_import_does_not_duplicate_distinct_same_day_reports`, `test_changed_source_id_updates_existing_record`, `test_malformed_records_are_skipped_but_missing_optional_location_is_kept` | Verified; real import inserted 1,000, repeat found 1,000 unchanged |
-| Search and filtering by location/time | `GET /sightings`, `app/main.py:get_filters`, `app/database.py:get_sightings` | `test_api.py:test_inclusive_date_filter`, `test_literal_case_insensitive_location`, `test_sightings_pagination`; database literal-search tests | Verified |
+| Data handling | `app/client.py:fetch_sightings`, `app/processing.py:normalize_record`, `scripts/import_sightings.py:import_sightings` | `test_processing.py`, mocked import/HTTP tests; actual source inspection and import | Verified; the initial import inserted 1,000. This audit's two repeat imports each retrieved 1,000, found 1,000 unchanged and inserted/updated/skipped 0 |
+| Duplicates | `app/database.py:save_sightings` with the `source_id` primary key | `test_import.py:test_repeat_import_does_not_duplicate_distinct_same_day_reports`, `test_changed_source_id_updates_existing_record`; repeated real imports | Verified; distinct IDs on the same date/city are retained |
+| Missing data | `app/processing.py:normalize_record` and `clean_text` | `test_processing.py`; `test_import.py:test_malformed_records_are_skipped_but_missing_optional_location_is_kept` | Verified with synthetic missing/malformed rows; essential ID/date failures skip, optional text becomes null |
+| Date filtering | `GET /sightings`, `app/main.py:get_filters`, `app/database.py:get_sightings` | `test_api.py:test_inclusive_date_filter`, invalid-range tests; database start/end/shared-filter tests | Verified; inclusive valid calendar dates |
+| Location filtering | `GET /sightings`, `app/database.py:_filters` | `test_api.py:test_literal_case_insensitive_location`; `test_database.py:test_search_is_literal_and_parameterised` | Verified; literal substring using SQLite lowercasing, sufficient for the inspected ASCII cities |
 | Regional/location reporting | `GET /stats/regions`, `app/database.py:count_sightings_by_region` | `test_api.py:test_regions_are_honest_city_counts`; `test_database.py:test_missing_location_is_reported_without_inventing_one`, `test_region_counts_use_locations_and_shared_filters` | Verified city-level aggregation; administrative regions unavailable in source, explicitly disclosed |
 | Weekly/monthly trends | `GET /stats/trends`, `app/database.py:get_trends` | `test_api.py:test_weekly_trends_across_year`, `test_monthly_trends`; database Monday/Sunday/year-boundary and filtered-bucket tests | Verified |
 | Error handling | Bounded HTTP retries/size, source errors, skipped rows, transactional saves, 422 validation and safe 503 responses | `test_import.py:test_failed_refresh_preserves_previous_import`, retry/timeout/JSON tests; `test_database.py:test_save_rolls_back_partial_changes`; `test_api.py:test_database_failure_is_safe`, invalid-query tests | Verified |
 
 ### Backend and documentation
 
+- [x] Old project safely preserved at `D:\First_Project`; its existing GitHub backup branch was reverified, not recreated.
+- [x] Elanco project uses the separate `furqanfsl/elanco-uk-tick-sightings-backend` repository, not the old project's remote.
 - [x] All four Backend core areas addressed: data handling, search/filtering, reporting and error handling.
 - [x] Application starts locally using the README's Uvicorn command.
-- [x] External import works with the inspected source; educational/unpaginated-data limitations documented.
-- [x] Filtering and valid empty results work.
+- [x] Swagger UI works at `http://127.0.0.1:8000/docs`; port 5500 static-file listing is not the backend.
+- [x] External Elanco API inspected; actual endpoint/schema and limitations documented.
+- [x] Elanco data integration implemented through the HTTP client and import script.
+- [x] Real import verified; educational/unpaginated-data limitations documented.
+- [x] Duplicate handling verified with repeat imports and stable-ID correction tests.
+- [x] Missing-data handling verified with isolated synthetic fixtures.
+- [x] Location filtering works, including the documented case-insensitive/literal behaviour.
+- [x] Date filtering works, including either boundary alone and inclusive combined ranges.
+- [x] Valid empty results work without inventing records.
 - [x] City-level statistics work without pretending cities are administrative regions.
-- [x] Monday-week and calendar-month trends work.
+- [x] Weekly trends work with Monday/week/year-boundary checks.
+- [x] Monthly trends work with first-of-month/calendar ordering checks.
 - [x] Error handling and failed-refresh preservation tested.
 - [x] Automated tests pass using isolated synthetic fixtures, without requiring Elanco access.
 - [x] Running-server verifier executed after restart: 24 checks passed, 0 skipped.
 - [x] Swagger rendered and success/422 interactions checked in desktop/mobile headless Edge; final before/after visual evidence and scoped accessibility checks are recorded in README.
 - [x] README includes setup, commands, limitations, decisions and actual launch evidence.
-- [x] Architecture explanation, video script and interview guide prepared.
+- [x] Architecture document is complete and matches the implementation.
+- [x] Interview guide includes file/function inputs and outputs, a concept glossary, 20 questions and five-minute revision notes.
+- [x] Video walkthrough script is complete; recording is a separate unchecked action below.
 
 ### Before publishing
 
 - [x] Add the name from the candidate's GitHub profile to the README, video script and email draft: Hafiz Furqan FAISEL.
 - [ ] Confirm that Hafiz Furqan FAISEL is the preferred name and spelling for the final submission.
-- [x] Review the final files and rerun tests after changes (117 passed on both tested Python runtimes).
+- [x] Review the files and rerun tests after changes (119 passed in the current project environment; see README for final clean-install/runtime rechecks).
 - [x] Confirm the final README launch record contains no outstanding verification items.
 - [x] Approve making `elanco-uk-tick-sightings-backend` public (explicit approval received 28 October 2026).
-- [x] Confirm the public repository exists and its `main` branch matches the local published commit.
+- [x] GitHub repository created and verified public with the user's approval.
+- [x] GitHub URL verified: https://github.com/furqanfsl/elanco-uk-tick-sightings-backend
+- [ ] After this audit's changes are pushed, verify the final remote `main` revision matches the local commit.
 - [x] Verify signed-out access: anonymous HTTP/source requests, a fresh browser context on desktop/mobile, and an anonymous Git clone all succeeded.
-- [x] Inspect the actual uploaded file list: exactly 27 intended files, with no `.venv`, `.env`, database, downloaded raw dataset, caches, personal notes or credentials. The public tree matches `git ls-files`; `data/` contains only `.gitkeep`.
+- [x] Previously published file list reviewed: no `.venv`, `.env`, database, downloaded raw dataset, caches, personal notes or credentials; `data/` contains only `.gitkeep`.
+- [ ] Recheck the final uploaded file list after adding the shared task configuration; personal `.vscode/settings.json` and `memory.md` must remain ignored.
 
 ### Video and final submission
 
@@ -46,7 +64,7 @@ The following evidence was observed on 28 October 2026. Automated verification i
 - [ ] Watch the complete video and confirm clear audio/readable text.
 - [ ] Confirm duration is no longer than 10 minutes.
 - [ ] Include the actual video file or a verified accessible video link.
-- [ ] Confirm the candidate's full name appears in the final submission.
+- [x] Candidate's full name is included in the prepared README, speaking script and email draft, using the GitHub-profile spelling.
 - [x] Short final email draft prepared below; **not sent**.
 - [ ] Replace all email placeholders and verify both links/attachments.
 - [ ] Send before **09:00 UK time on 1 November 2026**.
@@ -56,11 +74,11 @@ The following evidence was observed on 28 October 2026. Automated verification i
 
 **To:** BECKY.MEARS@network.elancoah.com
 
-**Subject:** Software Engineering Placement 2026 - Backend Task - Hafiz Furqan FAISEL
+**Subject:** Elanco Software Engineering Placement 2026 – Backend Technical Task Submission
 
 Dear Becky,
 
-Please find my Backend technical task submission for the Elanco Software Engineering Placement 2026.
+I selected the Backend task for the Elanco Software Engineering Placement 2026. Please find my submission below.
 
 - Candidate: Hafiz Furqan FAISEL
 - Public GitHub repository: https://github.com/furqanfsl/elanco-uk-tick-sightings-backend

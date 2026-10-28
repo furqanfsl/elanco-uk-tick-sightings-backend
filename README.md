@@ -2,6 +2,21 @@
 
 Public repository: [furqanfsl/elanco-uk-tick-sightings-backend](https://github.com/furqanfsl/elanco-uk-tick-sightings-backend)
 
+## Already have this project open in VS Code?
+
+**Use the Python backend on port 8000, not Go Live on port 5500.** Go Live is a static file server: its directory listing does not mean the backend is broken, and it cannot execute FastAPI. No HTML homepage is needed.
+
+For this computer's existing checkout, open **Terminal > New Terminal** and run:
+
+```powershell
+Set-Location D:\Elanco_Tick_Backend_2026
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Leave that terminal running, then open **[Swagger UI](http://127.0.0.1:8000/docs)**. If the backend is already running, use that link instead of starting a second copy. An empty database is valid; run the import command below to add the source records. The introduction at port 8000 is JSON, not a traditional website.
+
+Alternatively, press **Ctrl+Shift+B** to run **Elanco: Start backend (port 8000)**. **Terminal > Run Task** also offers **Elanco: Import sightings**, **Elanco: Verify local backend**, and **Elanco: Run tests**. These tasks call the same environment-based commands as this README; they do not use Live Server, launch automatically, or install packages. Use `Ctrl+C` in the backend task's terminal to stop it. Install the environment first if cloning onto another computer. Folder tasks are documented by [VS Code](https://code.visualstudio.com/docs/debugtest/tasks).
+
 ## Overview
 
 A small, read-only Python backend that imports the Elanco placement-task tick dataset, cleans it, stores it in SQLite, and returns searchable records and summaries as JSON. Swagger UI provides an interactive way to try the endpoints; there is no separate frontend.
@@ -45,23 +60,28 @@ tests/
   test_processing.py      Cleaning and missing/invalid source fields
   test_import.py          Mocked HTTP failures, imports and repeat-import safety
   test_database.py        Storage, rollback, filtering and calendar boundaries
-  test_config.py          Configuration validation
+  test_config.py          Configuration and VS Code task-command validation
   test_verify_local.py    Local verification success/failure paths
 data/.gitkeep             Keeps the empty data directory in Git
+.vscode/tasks.json        Explicit Python tasks; only this editor file is shared
 .env.example             Safe configuration reference (not automatically loaded)
 .gitignore               Excludes environments, local data, credentials and caches
 requirements.txt         Tested dependency versions
 ARCHITECTURE.md           Data flow, decisions and limitations
-VIDEO_WALKTHROUGH.md      Recording preparation and a 6–8 minute speaking script
+VIDEO_WALKTHROUGH.md      Recording preparation and a 7–8 minute speaking script
 SUBMISSION_CHECKLIST.md   Requirement evidence, remaining deliverables and email draft
-INTERVIEW_GUIDE.md        Plain-English explanation and ten interview questions
+INTERVIEW_GUIDE.md        File/function guide, concepts and twenty interview questions
 ```
 
 The extra database/configuration/verifier tests isolate useful regressions. No downloaded source data or database is included in the repository.
 
-## Installation — Windows PowerShell
+## Requirements
 
 Prerequisites: Python 3.12 or later, Internet access for installation/import, and Git if cloning the repository. Python downloads: [python.org](https://www.python.org/downloads/). The verified runtimes were Python 3.12.13 and 3.15.2 on Windows. Use an ordinary PowerShell terminal in the project folder.
+
+## Installation — Windows PowerShell
+
+Use these cloning steps only if you do not already have the project. Do not clone a second copy inside your existing working folder.
 
 ```powershell
 git clone https://github.com/furqanfsl/elanco-uk-tick-sightings-backend.git
@@ -76,7 +96,11 @@ These commands use the environment's interpreter directly, so activation and exe
 
 In VS Code, open this project folder, run **Python: Select Interpreter**, and choose `.venv\Scripts\python.exe` if the Python extension is already available. No additional extension is needed to run the terminal commands.
 
-## Running the application
+On macOS/Linux, the equivalent environment is created with `python3 -m venv .venv`, and its interpreter is `.venv/bin/python` instead of `.venv\Scripts\python.exe`. The shared tasks select the appropriate path. Those platforms were not executed in this Windows verification.
+
+## Database setup
+
+The import command and application startup both initialise the SQLite schema if it does not exist. The default local file is `data/sightings.db`. No database or downloaded dataset is included in Git. Starting without an import creates a valid empty database; importing fills it with the current source records.
 
 ```powershell
 # Optional: inspect the source structure without printing the dataset.
@@ -84,9 +108,15 @@ In VS Code, open this project folder, run **Python: Select Interpreter**, and ch
 
 # Download, clean and store data. Repeat this command to refresh it.
 .\.venv\Scripts\python.exe -m scripts.import_sightings
+```
 
+The summary reports actual retrieved, inserted, updated, unchanged, skipped and error counts. The same source IDs are unchanged on repeat imports. Invalid rows are skipped and counted; per-reason breakdowns are a future improvement.
+
+## Running the backend
+
+```powershell
 # Start the server and leave this terminal running.
-.\.venv\Scripts\python.exe -m uvicorn app.main:app
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 Open [Swagger UI](http://127.0.0.1:8000/docs) or the [health check](http://127.0.0.1:8000/health) in your browser. **Localhost links require the server to be running on your computer. Clicking a link does not launch it, and this is not a public deployment.** Press `Ctrl+C` to stop the server. Restart it after editing Python files; a reload watcher is not required.
@@ -113,6 +143,7 @@ Relative database paths resolve from the project folder, not the terminal's curr
 ### Troubleshooting
 
 - **Connection refused:** start Uvicorn and wait for “Application startup complete”, then reload the local link. A stopped server cannot serve a landing page.
+- **Directory listing at port 5500:** that is Live Server, not FastAPI. Use the backend terminal command or **Ctrl+Shift+B**, then open port **8000/docs**. Do not add an `index.html` or install Node.js to run this Python project. You may stop the unnecessary static server with VS Code's **Live Server: Stop Live Server** command; never kill the VS Code extension-host process to stop it. Do not expose a development file server to other machines or use it to share private files.
 - **Port 8000 already in use:** identify its owner. Stop only your own previous server with `Ctrl+C`, or deliberately configure another port and use that address consistently. Do not kill unrelated processes. The supplied verifier intentionally checks port 8000 by default.
 - **Python launcher missing:** install Python from the official link, then reopen the terminal. If `py -3` cannot find a runtime, inspect `py list` (new launcher) or `py -0p` (legacy launcher), and use the installed Python executable with `-m venv .venv`. On the development computer the existing 3.12 runtime was selected with `py -V:Astral/CPython3.12.13`; the clean `py -3` setup was separately verified with 3.15.2.
 - **No results:** run the import and inspect its counts. The inspected source dates were 2012–2024, so a 2026 filter correctly returns no records.
@@ -129,6 +160,9 @@ Relative database paths resolve from the project folder, not the terminal's curr
 | GET | `/sightings` | `location`, `start_date`, `end_date`, `limit` (1–200), `offset` (0–9223372036854775807) |
 | GET | `/stats/regions` | City-level counts; same location/date filters |
 | GET | `/stats/trends` | `period=week` or `period=month`; same location/date filters |
+| GET | `/docs` | Interactive Swagger UI |
+| GET | `/openapi.json` | Machine-readable API description |
+| GET | `/redoc` | FastAPI's alternate generated documentation |
 
 Examples after starting the server:
 
@@ -138,7 +172,14 @@ Examples after starting the server:
 - [City counts](http://127.0.0.1:8000/stats/regions)
 - [Weekly counts](http://127.0.0.1:8000/stats/trends?period=week)
 
-Location matching is a literal, case-insensitive substring, so `%` and `_` are ordinary characters, not wildcards. Results sort by date descending, then source ID ascending. Dates must be real `YYYY-MM-DD` calendar dates; both boundaries are inclusive. Invalid input returns HTTP 422. Database failures return a safe HTTP 503 response without database paths or secrets.
+Location matching is a literal, case-insensitive substring for the ASCII city names supplied by this source, so `%` and `_` are ordinary characters, not wildcards. SQLite's default `lower()` does not provide full Unicode case folding. Results sort by date descending, then source ID ascending. Dates must be real `YYYY-MM-DD` calendar dates; both boundaries are inclusive. Invalid input returns HTTP 422. Database failures return a safe HTTP 503 response without database paths or secrets.
+
+## Error handling
+
+- Network failures, HTTP 429 and server failures use at most three source attempts. Failed refreshes leave stored data available; the CLI explains the failure and exits nonzero.
+- Malformed JSON, unexpected response structure and oversized downloads are rejected. Invalid individual records are skipped without rejecting the other valid rows.
+- Invalid dates, reversed ranges, invalid page sizes/offsets and unsupported trend periods return HTTP 422.
+- SQLite request failures return a safe HTTP 503 message. All import saves share a transaction, so a failed save rolls back rather than leaving half an import.
 
 ## Testing
 
@@ -179,9 +220,9 @@ With more time: source-supported pagination, conflict/skip-reason reports, a rev
 
 Prepared for the Elanco Software Engineering Placement 2026 backend technical assessment. The walkthrough and final email are prepared as drafts, not recorded or sent. Complete [SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md) before submitting.
 
-## Launch verification — 28 October 2026
+## Earlier launch verification — 28 October 2026
 
-Working local startup and accurate instructions are part of this submission. Latest observed checks are recorded here; this is not a hosted deployment:
+Working local startup and accurate instructions are part of this submission. These checks describe the earlier publication checkpoint; the subsequent final audit is recorded below. This is not a hosted deployment:
 
 - Python 3.12.13 local environment: **117 tests passed, 0 failed**, with the one upstream deprecation warning described above.
 - Clean `py -3` virtual-environment installation with Python 3.15.2: installation, the full **117 tests**, and `pip check` passed. The same documented warning applies.
@@ -191,3 +232,15 @@ Working local startup and accurate instructions are part of this submission. Lat
 - Swagger rendered in headless Microsoft Edge at 1440px desktop and 390px mobile. Default, expanded, success and HTTP 422 states passed the scoped automated accessibility checks (8 states, zero reported violations), with no JavaScript errors or horizontal overflow. Before/after and success/error-detail screenshots were saved in the temporary `elanco-backend-20261028-qa` directory and inspected for layout, typography, colour, surfaces, writing and accessibility; contrast, button overlap and mobile code scrolling were corrected. This is not a full accessibility certification. Native browser-control connection was unavailable; actual headless browser testing was used, not an HTTP-only claim.
 - `pip check`, Python compilation and a dependency audit of the installed project environment passed. The initial virtual environment's old pip bootstrap had known advisories; pip was upgraded to 26.2.2 and the repeated audit reported **no known vulnerabilities**. The audit tool itself was installed only in a temporary environment, not added to application requirements.
 - Public GitHub publication was explicitly approved on 28 October 2026. Anonymous HTTP requests, signed-out desktop/mobile browser rendering and an anonymous clone verified the public repository and README. The uploaded tree contains exactly the 27 intended source/test/documentation files and no local database, raw dataset, credentials or session notes. A fresh Python 3.15.2 environment created from the public clone passed the README installation, `pip check` and **117 tests**, with the documented warning. Publishing the repository did not deploy the local server. The walkthrough video and email are still not recorded/sent.
+
+## Final existing-project audit — 28 October 2026
+
+- Preserved the existing backend implementation and database; no core rewrite, frontend, dependency replacement or port change was needed. The old `D:\First_Project` working tree remains unchanged, and its existing GitHub backup branch still matches commit `ad9c068`.
+- Confirmed the reported port 5500 page is Live Server's static directory listing. It remains unrelated to the Python backend. With only the previous owned Uvicorn process stopped, port 8000 correctly refused requests while port 5500 continued serving files. The documented task command then started Uvicorn successfully on `127.0.0.1:8000`, and Swagger rendered again. The VS Code extension host was not killed or reconfigured.
+- Added the shared Start/Import/Verify/Test process tasks and two configuration regression tests. All four resolved task commands were executed successfully. Native VS Code UI control was unavailable, so this verifies their actual command lines, not a claimed click on the Run Task menu. Personal `.vscode/settings.json` remains ignored.
+- Current Python 3.12.13 environment: **119 tests passed, 0 failed, 0 skipped**, with one known upstream warning. `compileall` and `pip check` passed. The local HTTP verifier passed **24 checks, 0 skipped** after restart.
+- Re-inspected the actual source documentation and data. Two repeat imports each retrieved **1,000** records and reported **1,000 unchanged**, with **0 inserted, updated, skipped or errors**. The later Import task returned the same outcome. Initial insertion was verified at the earlier checkpoint; the current audit did not pretend to insert new rows into an already-populated database.
+- SQLite `quick_check` returned `ok`; there are **1,000 rows and 1,000 unique source IDs**, no missing stored source fields, two explicit indexes and the primary-key index. Independent Python calculations match the actual HTTP reports: **14 city groups, 522 occupied weeks and 156 months**, each totalling 1,000.
+- Independent filtering checks matched stored rows: London **76**, mixed-case London **76**, `start_date=2024-01-01` **71**, `end_date=2012-12-31` **82**, the full 2024 range **71**, London in 2024 **2**, and a nonexistent city **0**. Page contents matched independent date/ID ordering. Invalid date/range/page/period requests returned HTTP 422. A newly-created disposable database was deliberately made unavailable to queries: all four database-backed routes returned safe HTTP 503 responses; the normal database was not modified.
+- Before/after desktop/mobile Swagger screenshots, stopped-backend states and the actual port 5500 listing were saved under the temporary `elanco-final-audit-20261028` folder. Actual Edge-rendered default, expanded, success and 422 states at 1440px/390px had no JavaScript errors or document overflow; all eight scoped axe checks reported zero violations. Pixel review found no new collisions. Manual-review items and dense mobile code remain limitations; this is not a full accessibility certification. No traditional HTML page was created.
+- Architecture, interview preparation (20 questions), the practical 7-8 minute video script and the individual submission checklist/email draft were checked against the existing code and the Backend brief. The video is **not recorded** and the email is **not sent**.

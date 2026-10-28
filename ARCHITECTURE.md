@@ -23,6 +23,12 @@ JSON responses / standard Swagger UI
 
 Importing and serving are separate commands. Opening `/sightings` reads the local database; it does not call Elanco. That keeps requests predictable and preserves access to previously imported records during an upstream outage. It also means the database is a snapshot, not a live feed. Refresh it by rerunning the import command in the README.
 
+## Local startup is not a static website
+
+Uvicorn runs the FastAPI object `app` in `app/main.py`, bound to `127.0.0.1:8000` by the documented command. A static-file server at port 5500 can list project files but cannot execute this Python backend. No HTML homepage or frontend framework is needed to correct that confusion. A localhost link only works while its server process is running.
+
+The four process tasks in `.vscode/tasks.json` are shortcuts for the same virtual-environment commands: start the backend, import sightings, verify the local server and run tests. `Ctrl+Shift+B` selects the default backend task. They do not install dependencies, run on folder-open or use Live Server. The README remains the authoritative setup path for a fresh clone.
+
 ## Source contract and normalisation
 
 The inspected endpoint is `GET https://dev-task.elancoapps.com/data/tick-sightings`. It returns one JSON array, without documented authentication or pagination. Elanco describes the data as educational. At inspection on 28 October 2026 there were 1,000 records, dated 3 January 2012 to 30 December 2024. These observations are not guarantees about future responses.
@@ -103,8 +109,12 @@ Invalid query values return HTTP 422. SQLite failures return HTTP 503 with a saf
 | `tests/test_config.py` | Path and configuration validation |
 | `tests/test_verify_local.py` | Verification success, skips and failures |
 
+`.vscode/tasks.json` is the shared optional editor shortcut; personal interpreter/settings files remain ignored. It uses the workspace's virtual environment rather than a private absolute path. The Windows commands were exercised; the Unix interpreter path is provided for portability, not claimed as a tested Linux/macOS launch.
+
 `requirements.txt` pins the tested direct dependencies. `.env.example` is a safe reference. `.gitignore` excludes local data, environments, private settings, caches and session notes. `data/.gitkeep` preserves an empty directory without publishing the database. The README contains setup and observed launch results; the walkthrough, checklist and interview guide support the human submission.
 
 ## Scope and next improvements
 
 No frontend, AI/ML, scheduled refresh, authentication or public hosting is included. Bind to localhost; public exposure needs further security work. With more time: a reviewed city-to-region reference, skip/conflict-reason reporting, source-supported pagination, authenticated scheduled imports, monitoring, and a database such as PostgreSQL if concurrent use justified it. Avoid adding those components merely to make this assessment look larger.
+
+The current import reports a skipped-row total, not per-reason counts or a raw-row error log. This avoids publishing source rows, but makes detailed data-quality investigation a future improvement. The case-insensitive search uses SQLite's built-in `lower()`, which covers the inspected ASCII city names; it is not full Unicode case folding.
