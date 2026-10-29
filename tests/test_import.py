@@ -5,6 +5,7 @@ import pytest
 
 from app.client import SourceError, fetch_sightings
 from app.config import Settings
+from app.database import get_sightings
 from scripts.inspect_api import inspect_api
 from scripts.import_sightings import import_sightings, main
 
@@ -39,6 +40,20 @@ def test_changed_source_id_updates_existing_record(settings, records):
     summary = import_sightings(settings, transport=response_transport(records))
     assert summary["updated"] == 1
     assert summary["unchanged"] == 1
+
+
+def test_repeated_id_within_one_import_keeps_last_valid_version(settings):
+    records = [
+        {"id": "synthetic-repeat", "date": "2024-01-01", "location": "Original City"},
+        {"id": "synthetic-repeat", "date": "2024-01-02", "location": "Corrected City"},
+        {"id": "synthetic-repeat", "date": "bad", "location": "Invalid City"},
+    ]
+    summary = import_sightings(settings, transport=response_transport(records))
+    assert summary == {"retrieved": 3, "inserted": 1, "updated": 1, "unchanged": 0, "skipped": 1, "errors": 0}
+    page = get_sightings(settings.database_path)
+    assert page["total"] == 1
+    assert page["items"][0]["sighting_date"] == "2024-01-02"
+    assert page["items"][0]["location"] == "Corrected City"
 
 
 def test_malformed_records_are_skipped_but_missing_optional_location_is_kept(settings, records):
@@ -129,6 +144,30 @@ def test_oversized_response_is_rejected(settings):
         fetch_sightings(settings, transport=response_transport([{"large": "x" * 20}]))
 
 
+def test_size_limit_stops_reading_stream_and_closes_it(settings):
+    class OversizedStream(httpx.SyncByteStream):
+        def __init__(self):
+            self.chunks_read = 0
+            self.closed = False
+
+        def __iter__(self):
+            for chunk in [b"[", b'"' + b"x" * 32, b'"]']:
+                self.chunks_read += 1
+                yield chunk
+
+        def close(self):
+            self.closed = True
+
+    stream = OversizedStream()
+    settings = Settings(database_path=settings.database_path, max_response_bytes=10)
+    transport = httpx.MockTransport(lambda request: httpx.Response(200, stream=stream))
+    with pytest.raises(SourceError, match="size limit"):
+        fetch_sightings(settings, transport=transport)
+    assert stream.chunks_read == 2
+    assert stream.closed is True
+    assert not settings.database_path.exists()
+
+
 def test_json_parser_recursion_has_safe_cli_error(settings, capsys, monkeypatch):
     # Parser nesting limits differ across Python versions; simulate the failure itself.
     def nesting_limit(body):
@@ -158,6 +197,17 @@ def test_cli_failure_has_clear_nonzero_result_and_no_traceback(settings, capsys)
     assert "Import failed:" in output.err
     assert "Traceback" not in output.err
     assert not settings.database_path.exists()
+
+
+def test_cli_database_error_is_nonzero_and_does_not_expose_path(settings, records, capsys):
+    # A directory cannot be opened as a SQLite file on Windows or Unix.
+    settings.database_path.mkdir()
+    assert main(settings, transport=response_transport(records)) == 1
+    output = capsys.readouterr()
+    assert output.out == ""
+    assert "local database could not be written" in output.err
+    assert str(settings.database_path) not in output.err
+    assert "Traceback" not in output.err
 
 
 def test_cli_prints_actual_counts(settings, records, capsys):

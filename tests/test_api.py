@@ -34,6 +34,18 @@ def test_sightings_pagination(populated_api):
     assert populated_api.get("/sightings?offset=99").json()["items"] == []
 
 
+def test_maximum_pagination_boundaries_are_accepted(populated_api):
+    page = populated_api.get("/sightings", params={"limit": 200, "offset": 0})
+    assert page.status_code == 200
+    assert len(page.json()["items"]) == page.json()["total"] == 4
+    assert page.json()["limit"] == 200
+
+    last_offset = 9223372036854775807
+    beyond_end = populated_api.get("/sightings", params={"offset": last_offset})
+    assert beyond_end.status_code == 200
+    assert beyond_end.json() == {"items": [], "total": 4, "limit": 50, "offset": last_offset}
+
+
 def test_literal_case_insensitive_location(populated_api):
     assert populated_api.get("/sightings?location=EXAMPLE").json()["total"] == 2
     for location in ["%", "_", "' OR 1=1 --", "absent"]:

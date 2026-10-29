@@ -174,6 +174,38 @@ Examples after starting the server:
 
 Location matching is a literal, case-insensitive substring for the ASCII city names supplied by this source, so `%` and `_` are ordinary characters, not wildcards. SQLite's default `lower()` does not provide full Unicode case folding. Results sort by date descending, then source ID ascending. Dates must be real `YYYY-MM-DD` calendar dates; both boundaries are inclusive. Invalid input returns HTTP 422. Database failures return a safe HTTP 503 response without database paths or secrets.
 
+### Request and response examples
+
+These responses were observed against the running local backend on 29 October 2026. The deliberately unmatched city is a test query, not an Elanco record. A fresh database has zero stored sightings until you import; the health count below describes this checkout's imported snapshot.
+
+```powershell
+Invoke-RestMethod 'http://127.0.0.1:8000/health' | ConvertTo-Json
+```
+
+HTTP 200:
+
+```json
+{"status": "ok", "database": "ok", "stored_sightings": 1000}
+```
+
+```powershell
+Invoke-RestMethod 'http://127.0.0.1:8000/sightings?location=__no_such_city_29_oct__&limit=5' | ConvertTo-Json
+```
+
+HTTP 200 (a valid search with no matches):
+
+```json
+{"items": [], "total": 0, "limit": 5, "offset": 0}
+```
+
+Try `GET /sightings?start_date=2024-12-31&end_date=2024-01-01` in Swagger. This reversed range returns HTTP 422:
+
+```json
+{"detail": "end_date must be on or after start_date."}
+```
+
+Other FastAPI query-validation failures use a structured `detail` array identifying the invalid parameter. Both forms retain the standard top-level `detail` key.
+
 ## Error handling
 
 - Network failures, HTTP 429 and server failures use at most three source attempts. Failed refreshes leave stored data available; the CLI explains the failure and exits nonzero.
@@ -207,6 +239,7 @@ SQLite is sufficient for this portable, single-machine MVP. Parameterised querie
 - **Reports:** weeks start Monday; months start on day 1. Only occupied buckets are returned. A date-filtered bucket may contain a partial week/month; its label is the bucket's first day, possibly before `start_date`. Counts do not estimate population exposure or disease prevalence.
 - **Local MVP:** no authentication, scheduling, public hosting, medical predictions or AI/ML. It binds to localhost by default. Do not expose it publicly without further security review.
 - The normalised table is not an archive of the full original source. The source data and local database are intentionally excluded from Git.
+- **Redistribution:** no explicit dataset licence or redistribution permission was found in the inspected upstream documentation or embedded OpenAPI metadata. Public API access is not evidence of redistribution permission; downloaded records and the generated database remain excluded from the repository.
 
 ## Future improvements
 
@@ -245,3 +278,16 @@ Working local startup and accurate instructions are part of this submission. The
 - Before/after desktop/mobile Swagger screenshots, stopped-backend states and the actual port 5500 listing were saved under the temporary `elanco-final-audit-20261028` folder. Actual Edge-rendered default, expanded, success and 422 states at 1440px/390px had no JavaScript errors or document overflow; all eight scoped axe checks reported zero violations. Pixel review found no new collisions. Manual-review items and dense mobile code remain limitations; this is not a full accessibility certification. No traditional HTML page was created.
 - Architecture, interview preparation (20 questions), the practical 7-8 minute video script and the individual submission checklist/email draft were checked against the existing code and the Backend brief. The video is **not recorded** and the email is **not sent**.
 - An independent anonymous public clone of this audit's source was installed into a new Python 3.15.2 environment using the README commands: **119 tests passed, 0 failed, 0 skipped**, with the same documented warning. `pip check` and compilation passed, and the clone was clean. Anonymous source/tree checks verified **28 intended tracked files**, including only the shared task file under `.vscode/`; no database, raw dataset, credentials, settings or session notes were uploaded. Public desktop/mobile README rendering showed the new 8000-versus-5500 quick start without document overflow. The repository remains public with the user's existing approval; the local API is not a hosted deployment.
+
+## Current local re-verification — 29 October 2026
+
+- Confirmed port 5500 still serves a static directory listing; no process was listening on port 8000 at the start of this check. Started the existing FastAPI entry point with the documented Uvicorn command on `127.0.0.1:8000`. No frontend, new dependency or production-code rewrite was needed.
+- Inspected the live source again: 1,000 objects with `id`, `date`, `location`, `species` and `latinName`, all strings and none missing/blank in this response. Two real repeat imports each reported 1,000 unchanged, zero inserted/updated/skipped/errors. This was not a new initial import.
+- Added four deterministic regressions: maximum pagination boundaries; the last valid correction for a repeated ID in one import; early termination and closure of an oversized response stream; and safe nonzero CLI failure when the database path is a directory.
+- Current Python 3.12.13 environment: **123 tests passed, 0 failed**, with the same documented upstream warning. `pip check`, compilation and `git diff --check` passed. The HTTP verifier passed **24 checks, 0 skipped**; all eight documented GET URLs returned HTTP 200.
+- Read-only SQLite `quick_check` returned `ok`; 1,000 rows have 1,000 unique source IDs. Independent Python counts matched HTTP filtering, stable pagination and all city/week/month reports: 14/522/156 groups respectively, each totalling 1,000. London matched 76, the full 2024 range 71, and London in 2024 matched 2. Invalid queries returned HTTP 422.
+- Fresh before/after headless Edge screenshots are under the temporary `elanco-backend-20261029-qa` directory. Swagger rendered at 1440px desktop and 390px mobile; real Try it out/Execute requests returned 200 and 422. Eight scoped axe states reported zero violations, with no JavaScript errors or document overflow. Actual rendered screenshots were inspected for layout, typography, colour, materials and writing. Dense mobile JSON and manual-review items remain compromises, not a full accessibility certification. No UI source changes were needed.
+- Reviewed all five submission documents; corrected the README heading and added observed request/response examples. The walkthrough's 846 spoken words and demonstration cues target 7-8 minutes; the actual recording still needs to be made and timed. Anonymous GitHub access returned HTTP 200 and confirmed the existing repository is public. **These documentation/test edits are local; they were not committed or pushed.** Record the video and review/send the submission manually.
+- Final clean Windows audit: anonymously cloned public revision `e0efd7f`, created a new Python 3.15.2 environment using the README commands and passed **119 tests, 0 failed, 0 skipped**. Then applied a hash-verified snapshot of all 28 intended tracked files, including the four local edits, and passed **123 tests, 0 failed, 0 skipped**. Both runs had the documented warning; installation, `pip check` and compilation passed. Subsequent edits only record these results in this README/checklist; application, tests, tasks and requirements are unchanged from the tested snapshot.
+- That clean checkout initially had no database. Its isolated server automatically created a valid empty database (verifier: **20 passed, 1 expected populated-data skip**). A real first import inserted **1,000**; a repeat found **1,000 unchanged**, with no updates/skips/errors. The populated verifier passed **24 checks, 0 skipped**, and an independent harness passed **44 checks**, including complete pagination and report reconciliation. The isolated port 8001 server was stopped; the main port 8000 backend remained healthy. Evidence is retained under temporary `elanco-final-clean-20261029-213121-fc37b05f`; no existing database was copied or cleared.
+- Final security/publication review: all 28 intended tracked files and 45 historical blobs had no hits for the checked known credential/private-key patterns; 11 representative private/generated paths were confirmed ignored. This is a scoped scan, not a guarantee that no secret can exist. `pip-audit` checked all **24 installed project-environment packages** against its vulnerability service with a fresh cache and reported **no known vulnerabilities**. The audit tool was installed only in a separate temporary environment; no application dependencies were added or changed. Public `main` still matches local committed `e0efd7f`; the four working-tree edits are not published. No commit, push, new publication, deletion, video recording or email submission was performed during the final audit.

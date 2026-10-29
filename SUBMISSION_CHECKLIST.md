@@ -2,6 +2,21 @@
 
 **Deadline: Sunday 1 November 2026, 09:00 UK time.** Plan to finish before the deadline, especially given Friday/Saturday availability. The placement interview is Thursday 29 October. A working backend is not the same as a completed submission: the video and sending the email remain human actions. Public publication was approved on 28 October 2026. The name below matches the candidate's GitHub profile; confirm the preferred submission spelling before sending.
 
+## Latest local review — 29 October 2026
+
+- [x] Reinspect the live source and repeat ingestion: two imports each returned 1,000 unchanged, with zero inserts, updates, skips or errors.
+- [x] Start the stopped backend using the README command; all eight documented GET URLs returned HTTP 200 and the verifier passed 24 checks, 0 skipped.
+- [x] Run the expanded deterministic suite: **123 passed, 0 failed**, with one known upstream warning; dependency consistency and compilation passed.
+- [x] Independently reconcile database rows, filtering, pagination and city/week/month report counts.
+- [x] Recheck desktop/mobile Swagger rendering and actual 200/422 interactions; before/after screenshots inspected, eight scoped axe states reported zero violations. Existing mobile JSON density/manual-review limitations remain.
+- [x] Review the five submission documents, fix the README heading and add observed JSON response examples.
+- [x] Confirm the existing GitHub repository still responds anonymously and is public.
+- [x] Reproduce a clean Windows install: public `e0efd7f` passed 119 tests; the hash-verified intended source snapshot passed 123, each with 0 failures/skips and the documented warning. The fresh server created an empty database automatically; first real ingestion inserted 1,000 and repeat ingestion found 1,000 unchanged. Populated verifier: 24 passed; independent clean-install harness: 44 passed.
+- [x] Recheck publication safety: 28 tracked files and 45 historical blobs had no checked known credential/private-key pattern hits; private/generated paths remain ignored. All 24 installed project-environment packages had no known vulnerabilities reported by the fresh-cache dependency audit. These checks are not an absolute security guarantee.
+- [x] Keep downloaded source records and the generated database out of Git. No explicit dataset redistribution permission was established from the inspected upstream documentation/OpenAPI; public access alone is not permission to redistribute.
+- [ ] Review, commit and push this recheck's local README/checklist/test changes; then recheck the remote revision and signed-out access. No commit or push was performed during this recheck. The publication and clean-clone checks below describe the 28 October revision.
+- [ ] Complete the recording, preferred-name confirmation and final submission actions below before the deadline.
+
 ## Requirement review
 
 The following evidence was observed on 28 October 2026. Automated verification independently rerun during this documentation review: **119 tests passed, 0 failed, 0 skipped**, with one documented upstream Starlette test-client deprecation warning. See the README's dated launch record for the latest installation, browser and running-server checks; subsequent changes require a recheck.
